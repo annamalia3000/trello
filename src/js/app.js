@@ -81,8 +81,8 @@ container.addEventListener('mousedown', (e) => {
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
 
-        draggedElement.style.width = `${rect.width}px`;
-        draggedElement.style.height = `${rect.height}px`;
+        draggedElement.style.left = `${rect.left}px`;
+        draggedElement.style.top = `${rect.top}px`;
 
         document.addEventListener('mouseup', onMouseUp);
         document.addEventListener('mousemove', onMouseMove);
@@ -99,18 +99,16 @@ const onMouseMove = (e) => {
 const onMouseUp = (e) => {
     if (!isDragging || !draggedElement) return;
 
-    draggedElement.classList.remove('dragged');
-    isDragging = false;
-    draggedElement.style.width = '';
-    draggedElement.style.height = '';
-    container.classList.remove('dragging');
-
     const newList = document.elementFromPoint(e.clientX, e.clientY).closest('.list');
+
     if (newList) {
+        // Удалите элемент из старого списка
+        draggedElement.parentElement.removeChild(draggedElement);
+
         const rect = draggedElement.getBoundingClientRect();
         const newItems = newList.querySelectorAll('.item');
 
-        // Find the insert position
+        // Найдите позицию вставки
         let beforeElement = null;
         newItems.forEach(item => {
             const itemRect = item.getBoundingClientRect();
@@ -126,7 +124,13 @@ const onMouseUp = (e) => {
         }
     }
 
+    draggedElement.style.left = '';
+    draggedElement.style.top = '';
+
+    draggedElement.classList.remove('dragged');
     draggedElement = null;
+    isDragging = false;
+    container.classList.remove('dragging');
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
 };
