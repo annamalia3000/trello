@@ -1,4 +1,4 @@
-import {moveItemInLocalStorage, moveItemBetweenListsInLocalStorage } from './localStorage';
+import { moveItemInLocalStorage, moveItemBetweenListsInLocalStorage } from './localStorage';
 
 let draggedElement;
 let isDragging = false;
@@ -37,6 +37,8 @@ export function initDragAndDrop(container) {
             initialListKey = draggedElement.closest('.list').dataset.listKey;
             initialIndex = Array.from(draggedElement.parentElement.children).indexOf(draggedElement);
 
+            console.log(`Dragging started. Initial list key: ${initialListKey}, initial index: ${initialIndex}`);
+
             document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
         }
@@ -53,16 +55,14 @@ export function initDragAndDrop(container) {
 
         container.querySelectorAll('.placeholder').forEach(el => el.remove());
 
-        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY).closest('.column');
-        console.log(potentialColumn);
-
+        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.column');
         if (potentialColumn) {
             const placeholder = document.createElement('li');
             placeholder.classList.add('placeholder');
             placeholder.style.height = `${draggedElement.offsetHeight}px`;
 
             const potentialList = potentialColumn.querySelector('.list');
-            const newItems = Array.from(potentialList.querySelectorAll('.item')) || [];
+            const newItems = Array.from(potentialList.querySelectorAll('.item'));
             let insertBeforeElement = null;
 
             if (newItems.length !== 0) {
@@ -73,8 +73,6 @@ export function initDragAndDrop(container) {
                         break;
                     }
                 }
-            } else {
-                potentialList.appendChild(placeholder);
             }
 
             if (insertBeforeElement) {
@@ -126,6 +124,7 @@ export function initDragAndDrop(container) {
         isDragging = false;
         container.classList.remove('dragging');
         document.body.classList.remove('dragging');
+        container.querySelectorAll('.placeholder').forEach(el => el.remove());
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     };
