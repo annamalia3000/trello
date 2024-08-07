@@ -1,6 +1,6 @@
 import { removeItemFromLocalStorage } from './localStorage';
 
-export const removeItem =  (e) => {
+export function removeItem(e) {
     if (e.target.classList.contains('remove-icon')) {
         const item = e.target.closest('.item');
         const currentList = e.target.closest('.list');

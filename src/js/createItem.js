@@ -1,6 +1,6 @@
 import { handleAddItem } from './addItem';
 
-export function createItem(text, currentList) {
+export function createItem(text) {
     const newItem = document.createElement('li');
     newItem.classList.add('item');
     newItem.innerHTML = `${text}<span class="remove-icon">×</span>`;

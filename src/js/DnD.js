@@ -1,3 +1,5 @@
+import {moveItemInLocalStorage, moveItemBetweenListsInLocalStorage } from './localStorage';
+
 let draggedElement;
 let isDragging = false;
 let offsetX = 0;
@@ -6,8 +8,10 @@ let initialPosition = {
     left: 0, 
     top: 0 
 };
+let initialIndex;
+let initialListKey;
 
-export function initDragAndDrop (container) {
+export function initDragAndDrop(container) {
     container.addEventListener('mousedown', (e) => {
         if (e.target.classList.contains('item')) {
             e.preventDefault();
@@ -30,6 +34,9 @@ export function initDragAndDrop (container) {
             draggedElement.style.height = `${rect.height}px`;
             draggedElement.style.position = 'absolute';
 
+            initialListKey = draggedElement.closest('.list').dataset.listKey;
+            initialIndex = Array.from(draggedElement.parentElement.children).indexOf(draggedElement);
+
             document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
         }
@@ -46,22 +53,28 @@ export function initDragAndDrop (container) {
 
         container.querySelectorAll('.placeholder').forEach(el => el.remove());
 
-        const potentialList = document.elementFromPoint(e.clientX, e.clientY)?.closest('.list');
+        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY).closest('.column');
+        console.log(potentialColumn);
 
-        if (potentialList) {
+        if (potentialColumn) {
             const placeholder = document.createElement('li');
             placeholder.classList.add('placeholder');
             placeholder.style.height = `${draggedElement.offsetHeight}px`;
 
-            const newItems = Array.from(potentialList.querySelectorAll('.item'));
+            const potentialList = potentialColumn.querySelector('.list');
+            const newItems = Array.from(potentialList.querySelectorAll('.item')) || [];
             let insertBeforeElement = null;
 
-            for (let item of newItems) {
-                const itemRect = item.getBoundingClientRect();
-                if (e.clientY < itemRect.top + itemRect.height / 2) {
-                    insertBeforeElement = item;
-                    break;
+            if (newItems.length !== 0) {
+                for (let item of newItems) {
+                    const itemRect = item.getBoundingClientRect();
+                    if (e.clientY < itemRect.top + itemRect.height / 2) {
+                        insertBeforeElement = item;
+                        break;
+                    }
                 }
+            } else {
+                potentialList.appendChild(placeholder);
             }
 
             if (insertBeforeElement) {
@@ -78,14 +91,24 @@ export function initDragAndDrop (container) {
         const newList = document.elementFromPoint(e.clientX, e.clientY)?.closest('.list');
 
         if (newList) {
-            draggedElement.parentElement.removeChild(draggedElement);
-
+            let newIndex;
             const placeholder = newList.querySelector('.placeholder');
+
             if (placeholder) {
+                newIndex = Array.from(newList.children).indexOf(placeholder);
                 newList.insertBefore(draggedElement, placeholder);
                 placeholder.remove();
             } else {
+                newIndex = newList.children.length;
                 newList.appendChild(draggedElement);
+            }
+
+            const newListKey = newList.dataset.listKey;
+
+            if (newListKey === initialListKey) {
+                moveItemInLocalStorage(newListKey, initialIndex, newIndex);
+            } else {
+                moveItemBetweenListsInLocalStorage(initialListKey, newListKey, initialIndex, newIndex);
             }
         } else {
             draggedElement.style.left = `${initialPosition.left}px`;
@@ -114,4 +137,4 @@ export function initDragAndDrop (container) {
     container.addEventListener('drop', (e) => {
         e.preventDefault();
     });
-};
+}

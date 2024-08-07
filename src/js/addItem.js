@@ -6,13 +6,13 @@ export function addItem(e) {
         const currentList = e.target.closest('.column').querySelector('.list');
         const addCard = e.target;
 
-        addCard.style.display = 'none'; 
+        addCard.style.display = 'none';
         createEditor(currentList, addCard);
     }
 };
 
-export function handleAddItem (listKey, itemText, currentList) {
-    const newItem = createItem(itemText, currentList);
+export function handleAddItem(listKey, itemText, currentList) {
+    const newItem = createItem(itemText);
     addItemToLocalStorage(listKey, itemText);
     currentList.appendChild(newItem);
 }

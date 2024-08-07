@@ -4,10 +4,8 @@ import { addItem } from './addItem';
 import { loadFromLocalStorage } from './localStorage';
 
 const container = document.querySelector('.container');
-
 container.addEventListener('click', removeItem);
 container.addEventListener('click', addItem);
-
 initDragAndDrop(container);
 
 const loadInitialData = () => {
