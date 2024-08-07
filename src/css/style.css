@@ -49,6 +49,7 @@ body {
 
 .item {
     display: block;
+    position: relative;
     width: 185px;
     background-color: rgb(255, 255, 255);
     border: 1px solid rgb(160, 156, 156);
@@ -125,7 +126,7 @@ body {
     font-size: 1.3rem;
 
 }
-.container.dragging {
+.container.dragging, body.dragging {
     cursor: grabbing;
 }
 
@@ -136,4 +137,8 @@ body {
 .placeholder {
     background-color: rgb(160, 156, 156);
     margin: 5px;
+}
+
+body.dragging .add-item {
+    cursor: grabbing;
 }
