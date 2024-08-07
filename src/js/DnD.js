@@ -51,38 +51,37 @@ export function initDragAndDrop(container) {
         draggedElement.style.left = `${left}px`;
         draggedElement.style.top = `${top}px`;
 
+        // Удаляем предыдущие placeholder элементы
         container.querySelectorAll('.placeholder').forEach(el => el.remove());
 
-        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY).closest('.column');
+        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.column');
         if (potentialColumn) {
-            const placeholder = document.createElement('li');
-            placeholder.classList.add('placeholder');
-            placeholder.style.height = `${draggedElement.offsetHeight}px`;
             const potentialList = potentialColumn.querySelector('.list');
             const newItems = Array.from(potentialList.querySelectorAll('.item'));
 
-            if (newItems.length !== 0) {
-                let insertBeforeElement = null;
-                
-                newItems.forEach((item) => {
-                    const itemRect = item.getBoundingClientRect();
-                    const itemTop = itemRect.top;
-                    const itemBottom = itemRect.bottom;
-                    
-                    if (e.clientY < (itemTop + itemBottom) / 2) {
-                        insertBeforeElement = item;
-                    }
-                });
+            let insertBeforeElement = null;
             
-                if (insertBeforeElement) {
-                    potentialList.insertBefore(placeholder, insertBeforeElement);
-                } else {
-                    potentialList.appendChild(placeholder);
+            if (newItems.length > 0) {
+                for (const item of newItems) {
+                    const itemRect = item.getBoundingClientRect();
+                    const itemMiddleY = itemRect.top + itemRect.height / 2;
+                    
+                    if (e.clientY < itemMiddleY) {
+                        insertBeforeElement = item;
+                        break;
+                    }
                 }
+            }
+
+            const placeholder = document.createElement('li');
+            placeholder.classList.add('placeholder');
+            placeholder.style.height = `${draggedElement.offsetHeight}px`;
+            
+            if (insertBeforeElement) {
+                potentialList.insertBefore(placeholder, insertBeforeElement);
             } else {
                 potentialList.appendChild(placeholder);
             }
-                     
         }
     };
 
