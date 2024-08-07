@@ -1,12 +1,14 @@
-export function createItem (text, currentList) {
+import { handleAddItem } from './addItem';
+
+export function createItem(text, currentList) {
     const newItem = document.createElement('li');
     newItem.classList.add('item');
     newItem.innerHTML = `${text}<span class="remove-icon">×</span>`;
 
-    currentList.appendChild(newItem);
+    return newItem;
 };
 
-export function createEditor (currentList, addCard) {
+export function createEditor(currentList, addItem) {
     const editorElement = document.createElement('div');
     editorElement.classList.add('editor');
 
@@ -24,7 +26,7 @@ export function createEditor (currentList, addCard) {
 
     removeIcon.addEventListener('click', () => {
         editorElement.remove();
-        addCard.style.display = 'block'; 
+        addItem.style.display = 'block'; 
     });
 
     editorElement.appendChild(inputElement);
@@ -36,8 +38,9 @@ export function createEditor (currentList, addCard) {
     addButton.addEventListener('click', () => {
         const inputValue = inputElement.value;
         if (inputValue) {
-            createItem(inputValue, currentList);
-            addCard.style.display = 'block'; 
+            const listKey = currentList.dataset.listKey;
+            handleAddItem(listKey, inputValue, currentList);
+            addItem.style.display = 'block'; 
             editorElement.remove();
         }
     });
