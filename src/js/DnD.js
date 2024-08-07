@@ -20,24 +20,22 @@ export function initDragAndDrop(container) {
             isDragging = true;
             container.classList.add('dragging');
             document.body.classList.add('dragging');
-
+    
             const rect = draggedElement.getBoundingClientRect();
             offsetX = e.clientX - rect.left;
             offsetY = e.clientY - rect.top;
-
-            initialPosition.left = rect.left + window.scrollX;
-            initialPosition.top = rect.top + window.scrollY;
-
+    
+            initialPosition.left = e.clientX - offsetX;
+            initialPosition.top = e.clientY - offsetY;
+    
             draggedElement.style.left = `${initialPosition.left}px`;
             draggedElement.style.top = `${initialPosition.top}px`;
             draggedElement.style.width = `${rect.width}px`;
             draggedElement.style.height = `${rect.height}px`;
             draggedElement.style.position = 'absolute';
-
+    
             initialListKey = draggedElement.closest('.list').dataset.listKey;
             initialIndex = Array.from(draggedElement.parentElement.children).indexOf(draggedElement);
-
-            console.log(`Dragging started. Initial list key: ${initialListKey}, initial index: ${initialIndex}`);
 
             document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
@@ -55,31 +53,36 @@ export function initDragAndDrop(container) {
 
         container.querySelectorAll('.placeholder').forEach(el => el.remove());
 
-        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.column');
+        const potentialColumn = document.elementFromPoint(e.clientX, e.clientY).closest('.column');
         if (potentialColumn) {
             const placeholder = document.createElement('li');
             placeholder.classList.add('placeholder');
             placeholder.style.height = `${draggedElement.offsetHeight}px`;
-
             const potentialList = potentialColumn.querySelector('.list');
             const newItems = Array.from(potentialList.querySelectorAll('.item'));
-            let insertBeforeElement = null;
 
             if (newItems.length !== 0) {
-                for (let item of newItems) {
+                let insertBeforeElement = null;
+                
+                newItems.forEach((item) => {
                     const itemRect = item.getBoundingClientRect();
-                    if (e.clientY < itemRect.top + itemRect.height / 2) {
+                    const itemTop = itemRect.top;
+                    const itemBottom = itemRect.bottom;
+                    
+                    if (e.clientY < (itemTop + itemBottom) / 2) {
                         insertBeforeElement = item;
-                        break;
                     }
+                });
+            
+                if (insertBeforeElement) {
+                    potentialList.insertBefore(placeholder, insertBeforeElement);
+                } else {
+                    potentialList.appendChild(placeholder);
                 }
-            }
-
-            if (insertBeforeElement) {
-                potentialList.insertBefore(placeholder, insertBeforeElement);
             } else {
                 potentialList.appendChild(placeholder);
             }
+                     
         }
     };
 
