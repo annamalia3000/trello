@@ -22,8 +22,8 @@ export function initDragAndDrop(container) {
             document.body.classList.add('dragging');
     
             const rect = draggedElement.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
+            offsetX = e.clientX - rect.left + 5;
+            offsetY = e.clientY - rect.top + 10;
     
             initialPosition.left = e.clientX - offsetX;
             initialPosition.top = e.clientY - offsetY;
@@ -51,7 +51,6 @@ export function initDragAndDrop(container) {
         draggedElement.style.left = `${left}px`;
         draggedElement.style.top = `${top}px`;
 
-        // Удаляем предыдущие placeholder элементы
         container.querySelectorAll('.placeholder').forEach(el => el.remove());
 
         const potentialColumn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.column');
@@ -115,11 +114,7 @@ export function initDragAndDrop(container) {
             draggedElement.style.top = `${initialPosition.top}px`;
         }
 
-        draggedElement.style.left = '';
-        draggedElement.style.top = '';
-        draggedElement.style.width = '';
-        draggedElement.style.height = '';
-        draggedElement.style.position = '';
+        draggedElement.removeAttribute('style');
 
         draggedElement.classList.remove('dragged');
         draggedElement = null;
@@ -130,12 +125,4 @@ export function initDragAndDrop(container) {
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
     };
-
-    container.addEventListener('dragover', (e) => {
-        e.preventDefault();
-    });
-
-    container.addEventListener('drop', (e) => {
-        e.preventDefault();
-    });
 }
